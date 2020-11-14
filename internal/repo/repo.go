@@ -11,8 +11,9 @@ import (
 
 // Repo holds info about repository.
 type Repo struct {
-	Name     string
-	CloneURL string
+	Name       string
+	CloneURL   string
+	ClonedPath string
 }
 
 // New creates new Repo instance.
@@ -34,16 +35,19 @@ func NewFromGithub(githubRepo *github.Repository) *Repo {
 // Clone clones repository to the current folder with "go-all-repos" prefix.
 func (r *Repo) Clone(prefix string) {
 	log.Printf("Cloning repo %q @ %s\n", r.Name, r.CloneURL)
+	clonedPath := fmt.Sprintf("%s-%s", prefix, r.Name)
 	if _, err := exec.Command(
 		"git",
 		"clone",
 		r.CloneURL,
-		fmt.Sprintf("%s-%s", prefix, r.Name),
+		clonedPath,
 		"--depth",
 		"1",
 	).Output(); err != nil {
+		clonedPath = ""
 		log.Printf("Error while cloning repo %q: %v\n", r.Name, err)
 	}
+	r.ClonedPath = clonedPath
 }
 
 func buildCloneURL(username, repo string) string {
