@@ -3,14 +3,14 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
-	"os/exec"
 	"strings"
 
 	"github.com/artemrys/go-all-repos/internal/repo"
 	"github.com/google/go-github/github"
 )
+
+const clonePrefix = "go-all-repos"
 
 var (
 	username   = flag.String("username", "", "Github username")
@@ -46,17 +46,7 @@ func main() {
 			repos = append(repos, repo.New(*username, r))
 		}
 	}
-	for _, repo := range repos {
-		log.Printf("Cloning repo %q @ %s\n", repo.Name, repo.CloneURL)
-		if _, err := exec.Command(
-			"git",
-			"clone",
-			repo.CloneURL,
-			fmt.Sprintf("go-all-repos-%s", repo.Name),
-			"--depth",
-			"1",
-		).Output(); err != nil {
-			log.Printf("Error while cloning repo %q: %v\n", repo.Name, err)
-		}
+	for _, r := range repos {
+		r.Clone(clonePrefix)
 	}
 }
