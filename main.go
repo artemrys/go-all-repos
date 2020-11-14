@@ -8,14 +8,9 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/artemrys/go-all-repos/internal/repo"
 	"github.com/google/go-github/github"
 )
-
-// Repo holds info about repository.
-type Repo struct {
-	Name string
-	URL  string
-}
 
 var (
 	username   = flag.String("username", "", "Github username")
@@ -33,12 +28,8 @@ func init() {
 	}
 }
 
-func buildRepoURL(username, repo string) string {
-	return fmt.Sprintf("https://github.com/%s/%s", username, repo)
-}
-
 func main() {
-	repos := []*Repo{}
+	repos := []*repo.Repo{}
 	if len(reposNames) == 0 {
 		ctx := context.Background()
 		client := github.NewClient(nil)
@@ -48,25 +39,19 @@ func main() {
 			log.Fatalf("Error while getting repositories for %q: %v\n", *username, err)
 		}
 		for _, r := range githubRepos {
-			repos = append(repos, &Repo{
-				Name: *r.Name,
-				URL:  *r.CloneURL,
-			})
+			repos = append(repos, repo.NewFromGithub(r))
 		}
 	} else {
-		for _, repo := range reposNames {
-			repos = append(repos, &Repo{
-				Name: repo,
-				URL:  buildRepoURL(*username, repo),
-			})
+		for _, r := range reposNames {
+			repos = append(repos, repo.New(*username, r))
 		}
 	}
 	for _, repo := range repos {
-		log.Printf("Cloning repo %q\n", repo.Name)
+		log.Printf("Cloning repo %q @ %s\n", repo.Name, repo.CloneURL)
 		if _, err := exec.Command(
 			"git",
 			"clone",
-			repo.URL,
+			repo.CloneURL,
 			fmt.Sprintf("go-all-repos-%s", repo.Name),
 			"--depth",
 			"1",
