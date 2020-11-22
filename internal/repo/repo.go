@@ -4,8 +4,8 @@ package repo
 import (
 	"fmt"
 	"log"
-	"os/exec"
 
+	"github.com/artemrys/go-all-repos/internal/helpers"
 	"github.com/google/go-github/github"
 )
 
@@ -32,21 +32,20 @@ func NewFromGithub(githubRepo *github.Repository) *Repo {
 	}
 }
 
-// Clone clones repository to the current folder with "go-all-repos" prefix.
+// Clone clones repository to the current folder with `prefix` prefix.
 func (r *Repo) Clone(prefix string) {
-	log.Printf("Cloning repo %q @ %s\n", r.Name, r.CloneURL)
+	log.Printf("Cloning repo %q from %s\n", r.Name, r.CloneURL)
 	clonedPath := fmt.Sprintf("%s-%s", prefix, r.Name)
-	if _, err := exec.Command(
-		"git",
-		"clone",
-		r.CloneURL,
-		clonedPath,
-		"--depth",
-		"1",
-	).Output(); err != nil {
-		clonedPath = ""
-		log.Printf("Error while cloning repo %q: %v\n", r.Name, err)
-	}
+	helpers.RunGit(
+		[]string{
+			"clone",
+			r.CloneURL,
+			clonedPath,
+			"--depth",
+			"1",
+		},
+		"",
+	)
 	r.ClonedPath = clonedPath
 }
 

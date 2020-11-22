@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/artemrys/go-all-repos/internal/config"
+	"github.com/artemrys/go-all-repos/internal/helpers"
 	"github.com/artemrys/go-all-repos/internal/repo"
 	"github.com/google/go-github/github"
 )
@@ -28,14 +29,14 @@ func NewGoFmtAction(repo *repo.Repo, githubClient *github.Client, config *config
 // Do does "go fmt" action for a particular repo.
 func (a GoFmtAction) Do() {
 	runPath := a.Repo.ClonedPath
-	RunGit(
+	helpers.RunGit(
 		[]string{
 			"checkout",
 			"-b",
 			"go-all-repos-update",
 		},
 		runPath)
-	Run(
+	helpers.Run(
 		"/usr/local/go/bin/go",
 		[]string{
 			"/usr/local/go/bin/go",
@@ -43,14 +44,14 @@ func (a GoFmtAction) Do() {
 		},
 		runPath,
 	)
-	RunGit(
+	helpers.RunGit(
 		[]string{
 			"add",
 			".",
 		},
 		runPath,
 	)
-	RunGit(
+	helpers.RunGit(
 		[]string{
 			"commit",
 			"-m",
@@ -59,7 +60,7 @@ func (a GoFmtAction) Do() {
 		runPath,
 	)
 	if !a.dryRun {
-		RunGit(
+		helpers.RunGit(
 			[]string{
 				"push",
 				"origin",
