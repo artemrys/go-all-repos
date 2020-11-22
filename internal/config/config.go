@@ -18,6 +18,8 @@ type Config struct {
 	RepoNames []string
 	// GithubAccessToken is a Github access token.
 	GithubAccessToken string
+	// Action is a string representation of a specific action to run.
+	Action string
 	// dryRun runs everything as normal is set to true.
 	// If set to false, does not push changes and does not create a PR.
 	DryRun bool
@@ -37,6 +39,7 @@ func NewFromFlags(progname string, args []string) (*Config, string, error) {
 	config := new(Config)
 	flags.StringVar(&config.Username, "username", "", "Github username")
 	flags.StringVar(&config.Repos, "repos", "", "Github repos to update, comma separeted")
+	flags.StringVar(&config.Action, "action", "", "Action to run")
 	flags.StringVar(&config.GithubAccessToken, "github-access-token", "", "Github access token")
 	flags.BoolVar(&config.DryRun, "dry-run", false, "Dry run (do not push anything if true)")
 	if err := flags.Parse(args); err != nil {
@@ -44,6 +47,19 @@ func NewFromFlags(progname string, args []string) (*Config, string, error) {
 	}
 	if config.Username == "" {
 		return nil, "", fmt.Errorf("username is blank, should be specified")
+	}
+	if config.Action == "" {
+		return nil, "", fmt.Errorf("action is blank, should be specified")
+	}
+	supportedActionsMap := map[string]bool{
+		"gofmt": true,
+	}
+	supportedActions := []string{}
+	for action := range supportedActionsMap {
+		supportedActions = append(supportedActions, action)
+	}
+	if _, ok := supportedActionsMap[config.Action]; !ok {
+		return nil, "", fmt.Errorf("action %q is not supported, supported actions: %v", config.Action, supportedActions)
 	}
 	if !config.DryRun && config.GithubAccessToken == "" {
 		return nil, "", fmt.Errorf("github-access-token is blank, should be specified")

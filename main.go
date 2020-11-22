@@ -51,7 +51,7 @@ func main() {
 	}
 	for _, r := range repos {
 		r.Clone(clonePrefix)
-		e := action.NewGoFmtAction(r, githubClient, config.DryRun)
-		e.Do()
+		a := action.NewAction(r, githubClient, config)
+		a.Do()
 	}
 }

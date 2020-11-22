@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/artemrys/go-all-repos/internal/config"
 	"github.com/artemrys/go-all-repos/internal/repo"
 	"github.com/google/go-github/github"
 )
@@ -16,11 +17,11 @@ type GoFmtAction struct {
 }
 
 // NewGoFmtAction returns a new instance of GoFmtAction.
-func NewGoFmtAction(repo *repo.Repo, githubClient *github.Client, dryRun bool) *GoFmtAction {
+func NewGoFmtAction(repo *repo.Repo, githubClient *github.Client, config *config.Config) *GoFmtAction {
 	return &GoFmtAction{
 		Repo:         repo,
 		GithubClient: githubClient,
-		dryRun:       dryRun,
+		dryRun:       config.DryRun,
 	}
 }
 

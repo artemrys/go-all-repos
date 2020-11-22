@@ -14,38 +14,42 @@ func TestNewFromFlags_Correct(t *testing.T) {
 		wantConfig *Config
 	}{
 		{
-			desc: "username with dry run",
-			args: []string{"-username", "artemrys", "-dry-run"},
+			desc: "username with dry run, gofmt action",
+			args: []string{"-username", "artemrys", "-dry-run", "-action", "gofmt"},
 			wantConfig: &Config{
 				Username: "artemrys",
+				Action:   "gofmt",
 				DryRun:   true,
 			},
 		},
 		{
-			desc: "username with github access token",
-			args: []string{"-username", "artemrys", "-github-access-token", "github-access-token"},
+			desc: "username with github access token and gofmt action",
+			args: []string{"-username", "artemrys", "-action", "gofmt", "-github-access-token", "github-access-token"},
 			wantConfig: &Config{
 				Username:          "artemrys",
+				Action:            "gofmt",
 				GithubAccessToken: "github-access-token",
 			},
 		},
 		{
-			desc: "username with a repo and github access token",
-			args: []string{"-username", "artemrys", "-repos", "go-all-repos-demo", "-github-access-token", "github-access-token"},
+			desc: "username with a repo, github access token and action",
+			args: []string{"-username", "artemrys", "-repos", "go-all-repos-demo", "-action", "gofmt", "-github-access-token", "github-access-token"},
 			wantConfig: &Config{
 				Username:          "artemrys",
 				Repos:             "go-all-repos-demo",
 				RepoNames:         []string{"go-all-repos-demo"},
+				Action:            "gofmt",
 				GithubAccessToken: "github-access-token",
 			},
 		},
 		{
-			desc: "username with multiple repos and github access token",
-			args: []string{"-username", "artemrys", "-repos", "go-all-repos-demo,go-all-repos", "-github-access-token", "github-access-token"},
+			desc: "username with multiple repos, github access token and gofmt action",
+			args: []string{"-username", "artemrys", "-repos", "go-all-repos-demo,go-all-repos", "-action", "gofmt", "-github-access-token", "github-access-token"},
 			wantConfig: &Config{
 				Username:          "artemrys",
 				Repos:             "go-all-repos-demo,go-all-repos",
 				RepoNames:         []string{"go-all-repos-demo", "go-all-repos"},
+				Action:            "gofmt",
 				GithubAccessToken: "github-access-token",
 			},
 		},
@@ -74,8 +78,12 @@ func TestNewFromFlags_Incorrect(t *testing.T) {
 			args: []string{},
 		},
 		{
-			desc: "not dry run, no github access token",
-			args: []string{"-username", "artemrys"},
+			desc: "not dry run, no github access token, gofmt action",
+			args: []string{"-username", "artemrys", "-action", "gofmt"},
+		},
+		{
+			desc: "not supported action",
+			args: []string{"-username", "artemrys", "-action", "notsupportedaction"},
 		},
 	}
 	for _, tc := range tests {
